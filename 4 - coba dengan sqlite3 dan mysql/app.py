@@ -46,15 +46,51 @@ class IniResource(Resource):
         nim = request.form['nim']
         nama = request.form['nama']
         jurusan = request.form['jurusan']
-        ipk = int(request.form['ipk'])
+        ipk = float(request.form['ipk'])
         mahasiswaBaru = Mahasiswa(nim=nim, nama=nama, jurusan=jurusan, ipk=ipk)
         mahasiswaBaru.save()
         
         return ['alhamdulillah masuk bro']
+    
+    # hapus semua
+    def delete(self):
+        # 'untuk menghapus semua data'
+        # mahasiswa = Mahasiswa.query.all()
+        # for data in mahasiswa:
+        #     # hapusmahasiswa = Mahasiswa.query.get(data.nim)
+        #     dbku.session.delete(data)
+        #     dbku.session.commit()
+
+        'hapus berdasarkan nim'    
+        nim = request.form['nim']
+        try:
+            hapusData = Mahasiswa.query.get_or_404(nim)
+            dbku.session.delete(hapusData)
+            dbku.session.commit()
+            return {'msg': f'data dengan nim{nim} berhasil dihapus'}
+        except:
+            return {'msg error':f'kemungkinan nim yang anda masukkan tidak ada'}
+        # dbku.session.flush()
+        # return {'msg':'berhasil dihapus semua mungkin bro'}
         
+    def put(self):
+        'ubah data'
+        nim = request.form['nim']
+        try:
+            editData = Mahasiswa.query.get_or_404(nim)
+            # nama = request.form['nama']
+            # jurusan = request.form['jurusan']
+            # ipk = request.form['ipk']
+            editData.nama = request.form['nama']
+            editData.jurusan = request.form['jurusan']
+            editData.ipk = float(request.form['ipk'])
+            dbku.session.commit()
+            return {'msg':f' data dengan nim {nim} berhasil di edit'}
+        except:
+            return {'msg error':'ada yang salah bro pada database, mungkin {nim} yang anda masukkan tidak ada'}
 
 
-apiku.add_resource(IniResource, '/apiku', methods=['GET', 'POST'])
+apiku.add_resource(IniResource, '/apiku', methods=['GET', 'POST', 'DELETE', 'PUT'])
 
 if __name__ == '__main__':
     aplikasiku.run(debug=True)
