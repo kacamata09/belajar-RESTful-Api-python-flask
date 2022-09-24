@@ -1,8 +1,6 @@
 # import library yang dibutuhkan
 from flask import Flask, request
 from flask_sqlalchemy import SQLAlchemy
-from flask_restful import Api, Resource
-from flask_cors import CORS
 
 # inisiasi app ke menjadi object flask
 app = Flask(__name__)
@@ -11,10 +9,6 @@ app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///dblatihan.db'
 dbku = SQLAlchemy(app)
 
-# inisiasi variable api
-apiku = Api(app)
-CORS(app)
-
      
 # buat orm class model untuk database   
 class Pegawai(dbku.Model):
@@ -22,21 +16,10 @@ class Pegawai(dbku.Model):
     nama = dbku.Column(dbku.String(50), nullable=False)
     jabatan = dbku.Column(dbku.String(100))
     
-# buat class resource
-class IniResource(Resource):
-    def get(self):
-        'ini adalah fungsi get data'
-        pegawai = Pegawai.query.all()
-        datapegawai = [{
-            'id': data.id,
-            'nama': data.nama,
-            'jabatan': data.jabatan
-        } for data in pegawai
-        ]
-        return {'pesan':'ini datanya bro', 'Data Pegawai': datapegawai}
-        
-        
-    def post(self):
+
+@app.route('/restapi', methods=['POST', 'GET', 'PUT', 'DELETE'])
+def apiku():    
+    if request.method == 'POST':
         'ini adalah fungsi post'
         nama = request.form['nama']
         jabatan = request.form['jabatan']
@@ -45,7 +28,7 @@ class IniResource(Resource):
         dbku.session.commit()
         return {'pesan': 'data anda berhasil disimpan'}
     
-    def put(self):
+    if request.method =='PUT':
         'ini adalah fungsi put atau edit data pada rest api'
         id = request.form['id']
         try:
@@ -56,8 +39,8 @@ class IniResource(Resource):
             return {'pesan':'berhasil edit bro'}
         except:
             return {'pesan': f'tampaknya ada kesalahan bro, kemungkinan sih id {id} gak ada'}
-        
-    def delete(self):
+
+    if request.method == 'DELETE':
         'ini adalah fungsi hapus data'
         id = request.form['id']
         try:
@@ -67,8 +50,19 @@ class IniResource(Resource):
             return {'pesan':f'data dengan id {id} dan nama {pegawai.nama} berhasil dihapus'}
         except:
             return {'pesan': f'ada yang salah bro, kemungkinan id {id} yang anda masukkan tidak ada'}
+            
+    'ini adalah fungsi get data'
+    pegawai = Pegawai.query.all()
+    datapegawai = [{
+        'id': data.id,
+        'nama': data.nama,
+        'jabatan': data.jabatan
+    } for data in pegawai
+    ]
+    return {'pesan':'ini datanya bro', 'Data Pegawai': datapegawai}
+
     
-apiku.add_resource(IniResource, '/restapi', methods=['POST', 'GET', 'PUT', 'DELETE'])
+
 
 if __name__ == '__main__':
     app.run(debug=True)
