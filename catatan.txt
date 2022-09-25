@@ -1,0 +1,9 @@
+coba buat authorization simple seperti ada nya perbedaan akses antara admin dan user biasa
+
+if Pengguna query == admin: akses dashboard, halaman admin, halaman rahasia, halaman mahasiswa
+elif pengguna query == mahasiswa: akses dashboard, halaman mahasiswa
+
+cara nya
+buat dua decorator
+yang pertama pasti decorator untuk kunci akses menggunakan token
+yang kedua buat decorator untuk kunci akses halaman admin, dll
